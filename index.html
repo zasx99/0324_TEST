@@ -788,7 +788,18 @@
       artTag.textContent = `${scene.tag} · 이미지 ${pageNumber}`;
       artEmoji.textContent = pageNumber;
       artCaption.textContent = scene.caption;
-      sceneArt.style.background = getSceneGradient(state.sceneIndex);
+      // 이미지 자동 연결 (없으면 그라데이션)
+      const imgPath = `./images/${pageNumber}.png`;
+      const testImg = new Image();
+      testImg.src = imgPath;
+      testImg.onload = () => {
+        sceneArt.style.backgroundImage = `url('${imgPath}')`;
+        sceneArt.style.backgroundSize = 'cover';
+        sceneArt.style.backgroundPosition = 'center';
+      };
+      testImg.onerror = () => {
+        sceneArt.style.background = getSceneGradient(state.sceneIndex);
+      };
 
       prevBtn.disabled = state.sceneIndex === 0 && state.lineIndex === 0;
 
