@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>교통사고를 당했는데 눈 떠보니 예루살렘이라니요!?</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: rgba(255,255,255,0.88);
+      --text: #1c2430;
+      --muted: #64748b;
+      --line: #d9e2ef;
+      --accent: #3b82f6;
+      --accent-2: #8b5cf6;
+      --good: #16a34a;
+      --bad: #dc2626;
+      --shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+      background: linear-gradient(180deg, #eef6ff 0%, #fdfcff 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .wrap {
+      width: 100%;
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 14px 12px 18px;
+      gap: 10px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pill {
+      background: rgba(255,255,255,0.8);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: var(--muted);
+      box-shadow: var(--shadow);
+    }
+
+    .title {
+      background: linear-gradient(135deg, #fff, #f4f0ff);
+      border: 1px solid #e9e8ff;
+      border-radius: 22px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 21px;
+      line-height: 1.4;
+      letter-spacing: -0.02em;
+      text-align: center;
+    }
+
+    .subtitle {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--muted);
+    }
+
+    .scene {
+      position: relative;
+      border-radius: 24px;
+      overflow: hidden;
+      min-height: 290px;
+      background: #dbeafe;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,0.6);
+    }
+
+    .scene-art {
+      height: 290px;
+      padding: 20px;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      position: relative;
+      color: white;
+    }
+
+    .scene-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.22) 100%);
+      pointer-events: none;
+    }
+
+    .art-content {
+      width: 100%;
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .art-tag {
+      align-self: flex-start;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.25);
+      backdrop-filter: blur(8px);
+    }
+
+    .art-emoji {
+      font-size: 68px;
+      text-align: center;
+      margin: auto 0;
+      filter: drop-shadow(0 8px 12px rgba(0,0,0,0.18));
+    }
+
+    .art-caption {
+      font-size: 14px;
+      line-height: 1.5;
+      color: rgba(255,255,255,0.92);
+      text-shadow: 0 2px 8px rgba(0,0,0,0.22);
+    }
+
+    .dialogue {
+      margin-top: -18px;
+      position: relative;
+      z-index: 3;
+      background: var(--card);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.75);
+      border-radius: 24px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .speaker {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent-2);
+      margin-bottom: 8px;
+    }
+
+    .bubble {
+      min-height: 84px;
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+      line-height: 1.75;
+      font-size: 16px;
+      word-break: keep-all;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+    }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .controls, .quiz-actions, .start-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    button {
+      appearance: none;
+      border: none;
+      background: white;
+      color: var(--text);
+      border-radius: 16px;
+      padding: 13px 14px;
+      font-size: 15px;
+      font-weight: 700;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--line);
+      cursor: pointer;
+      flex: 1;
+    }
+
+    button.primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: white;
+      border: none;
+    }
+
+    button.ghost {
+      background: #ffffffcc;
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: default;
+    }
+
+    .letters {
+      background: linear-gradient(135deg, #fff, #fff7ed);
+      border: 1px solid #fde7c3;
+      border-radius: 22px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .letters h2, .quiz-card h2, .result-card h2 {
+      margin: 0 0 10px;
+      font-size: 15px;
+    }
+
+    .letter-grid {
+      display: grid;
+      grid-template-columns: repeat(9, 1fr);
+      gap: 6px;
+    }
+
+    .letter-cell {
+      aspect-ratio: 1 / 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      border: 1px dashed #f0b978;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 15px;
+    }
+
+    .letter-cell.empty {
+      color: #cbd5e1;
+    }
+
+    .letter-note {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #8a5a1d;
+      line-height: 1.5;
+    }
+
+    .quiz-card, .result-card {
+      background: linear-gradient(135deg, #ffffff, #f8fbff);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .question {
+      font-size: 17px;
+      font-weight: 800;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .choice-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .choice {
+      text-align: left;
+      background: white;
+      border: 1px solid var(--line);
+    }
+
+    .input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px 14px;
+      font-size: 16px;
+      outline: none;
+      background: white;
+    }
+
+    .hint-box {
+      margin-top: 12px;
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      border-radius: 16px;
+      padding: 12px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .feedback {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 14px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .feedback.good {
+      background: #ecfdf3;
+      border: 1px solid #bbf7d0;
+      color: #166534;
+    }
+
+    .feedback.bad {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+    }
+
+    .small {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .hidden { display: none; }
+
+    .credits {
+      text-align: center;
+      font-size: 11px;
+      color: var(--muted);
+      padding-bottom: 8px;
+    }
+
+    .ending-box {
+      margin-top: 12px;
+      background: linear-gradient(135deg, #eff6ff, #f5f3ff);
+      border: 1px solid #ddd6fe;
+      border-radius: 18px;
+      padding: 14px;
+      line-height: 1.7;
+      font-size: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="pill" id="progressPill">스토리 1 / 10</div>
+      <div class="pill" id="modePill">오프닝</div>
+    </div>
+
+    <section class="title" id="titleSection">
+      <h1>교통사고를 당했는데<br>눈 떠보니 예루살렘이라니요!?</h1>
+    </section>
+
+    <section class="result-card" id="startSection">
+      <div style="text-align:center;">
+        <h1 style="margin-bottom:16px; font-size:22px; line-height:1.4;">
+          교통사고를 당했는데<br>눈 떠보니 예루살렘이라니요!?
+        </h1>
+      </div>
+
+      <div style="border-radius:18px; overflow:hidden; border:1px solid var(--line); margin-bottom:16px; background:#fff;">
+        <img src="./images/1.png" alt="1번 이미지" style="display:block; width:100%; height:auto;" />
+      </div>
+
+      <div class="start-actions">
+        <button class="primary" id="startBtn">게임 시작</button>
+      </div>
+    </section>
+
+    <section id="storySection" class="hidden">
+      <div class="scene">
+        <div class="scene-art" id="sceneArt">
+          <div class="scene-overlay"></div>
+          <div class="art-content">
+            <div class="art-tag" id="artTag">프롤로그</div>
+            <div class="art-emoji" id="artEmoji">2</div>
+            <div class="art-caption" id="artCaption">교복을 입고 교회로 향하던 아침. 아무 일도 없을 것 같았다.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dialogue">
+        <div class="speaker" id="speaker">주인공</div>
+        <div class="bubble" id="bubble"></div>
+        <div class="meta-row">
+          <span id="lineCounter">대화 1 / 4</span>
+          <span>짧게 읽고, 천천히 넘어가세요</span>
+        </div>
+        <div class="controls">
+          <button class="ghost" id="prevBtn">◀ 이전</button>
+          <button class="primary" id="nextBtn">다음 ▶</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="letters hidden" id="lettersSection">
+      <h2>획득한 단서</h2>
+      <div class="letter-grid" id="letterGrid"></div>
+      <div class="letter-note" id="letterNote">각 퀴즈를 풀면 정답 조합에 필요한 단서를 하나씩 얻습니다. 순서는 섞여 있습니다.</div>
+    </section>
+
+    <section class="quiz-card hidden" id="quizSection">
+      <div style="display:flex; gap:8px; margin-bottom:10px;">
+        <button class="ghost" id="quizPrevBtn">◀ 이전 (스토리)</button>
+      </div>
+      <h2>퀴즈</h2>
+      <div class="question" id="quizQuestion"></div>
+      <div id="quizBody"></div>
+      <div class="feedback hidden" id="quizFeedback"></div>
+      <div class="quiz-actions hidden" id="quizNextWrap">
+        <button class="primary" id="quizNextBtn">다음 ▶</button>
+      </div>
+    </section>
+
+    <section class="result-card hidden" id="finalSection">
+      <h2>최종 정답</h2>
+      <div class="question">지금까지 모은 단서를 조합해 마지막 정답을 입력하세요.</div>
+      <input class="input" id="finalInput" placeholder="정답을 입력하세요" />
+      <div class="quiz-actions">
+        <button class="primary" id="finalSubmit">최종 정답 제출</button>
+      </div>
+      
+      <div class="feedback hidden" id="finalFeedback"></div>
+      <div class="ending-box hidden" id="endingBox"></div>
+    </section>
+
+    <div id="pageNumber" style="text-align:center; font-size:12px; color:#94a3b8; margin-top:6px;"></div>
+    <div class="credits">모바일 화면에 맞춰 제작된 싱글 파일 HTML 게임</div>
+  </div>
+
+  <script>
+    const storyData = [
+      {
+        tag: '오프닝',
+        emoji: '🚶‍♂️🌤️',
+        caption: '교복을 입고 교회로 향하던 아침. 평범한 부활주일이 될 줄 알았다.',
+        speaker: '주인공',
+        lines: [
+          '4월 5일, 신촌성결교회 중고등1부 전도축제이자 부활주일.',
+          '교복데이라서 오랜만에 교복을 꺼내 입고 집을 나섰다.',
+          '이어폰을 끼고 횡단보도 앞에 멈췄다.',
+          '그때, 눈부신 하얀 빛이 정면에서 달려왔다.'
+        ],
+        
+      },
+      {
+        tag: '오프닝',
+        emoji: '💥🚚',
+        caption: '브레이크 소리, 충격, 그리고 암전. 시간이 찢어진 것 같은 순간.',
+        speaker: '주인공',
+        lines: [
+          '트럭이었다.',
+          '쾅— 하는 소리와 함께 세상이 뒤집혔다.',
+          '어둠이 나를 덮쳤고, 모든 소리가 멀어졌다.',
+          '얼마나 지났을까. 다시 눈을 떴다.'
+        ]
+      },
+      {
+        tag: '낯선 도시',
+        emoji: '🏺☀️',
+        caption: '돌바닥, 흙먼지, 낯선 말. 여기는 서울이 아니었다.',
+        speaker: '주인공',
+        lines: [
+          '사람들은 처음 듣는 말로 웅성거리고 있었다.',
+          '나는 떨리는 손으로 근처 돌기둥의 글씨를 더듬어 읽었다.',
+          '“예... 예루살렘...?”',
+          '설마. 여긴 약 AD 33년의 예루살렘인 것 같다.'
+        ],
+        quiz: {
+          type: 'text',
+          question: '주인공이 떨어진 곳의 이름을 입력하세요.',
+          answer: ['예루살렘', 'jerusalem', '예루살램'],
+          hint: '오프닝 뒤 처음으로 확인한 도시 이름입니다.',
+          reward: '직접 획득: E'
+        }
+      },
+      {
+        tag: '소문',
+        emoji: '👥🗣️',
+        caption: '군중 사이로 한 이름이 반복해서 들린다. 긴장감이 감돈다.',
+        speaker: '행인',
+        lines: [
+          '“나사렛 예수라는 자를 끌고 간대!”',
+          '“빌라도에게 넘겨졌다고 하더라!”',
+          '사람들은 한쪽 골목으로 몰려가기 시작했다.',
+          '나도 무언가에 이끌리듯 그들을 따라갔다.'
+        ],
+        quiz: {
+          type: 'choice',
+          question: '사람들이 외치고 있던 인물은 누구였을까?',
+          choices: ['세례 요한', '모세', '나사렛 예수', '다윗'],
+          answer: '나사렛 예수',
+          hint: '군중의 외침을 그대로 떠올리면 됩니다.',
+          reward: '힌트 획득: “예수님의 이름에 두 번 들어가는 글자”'
+        }
+      },
+      {
+        tag: '십자가의 길',
+        emoji: '✝️🌫️',
+        caption: '무거운 나무, 넘어지는 발걸음, 울부짖는 군중. 장면이 너무 선명하다.',
+        speaker: '주인공',
+        lines: [
+          '예수님은 십자가를 지고 힘겹게 걸어가고 계셨다.',
+          '사람들의 조롱과 울음소리가 뒤섞였다.',
+          '그 장면을 보고 있는데 가슴이 답답해졌다.',
+          '이건 단순한 꿈이 아니다. 나는 정말 그 현장에 와 있다.'
+        ],
+        quiz: {
+          type: 'choice',
+          question: '예수님이 지고 가신 것은 무엇이었을까?',
+          choices: ['왕관', '두루마리', '십자가', '횃불'],
+          answer: '십자가',
+          hint: '기독교 신앙의 핵심 장면입니다.',
+          reward: '직접 획득: U'
+        }
+      },
+      {
+        tag: '어둠',
+        emoji: '🌑⛰️',
+        caption: '한낮인데 하늘이 어두워진다. 모두가 숨을 죽인다.',
+        speaker: '주인공',
+        lines: [
+          '십자가 위에서 예수님이 마지막 숨을 내쉬시는 순간,',
+          '한낮인데도 하늘이 어두워졌다.',
+          '사람들은 두려움에 떨기 시작했다.',
+          '나도 알 수 없는 슬픔에 말을 잃었다.'
+        ],
+        quiz: {
+          type: 'text',
+          question: '예수님이 달리신 것은 무엇인가요? 한 단어로 입력하세요.',
+          answer: ['십자가'],
+          hint: '바로 직전 장면의 중심 물체입니다.',
+          reward: '힌트 획득: “LOVE의 마지막 글자”'
+        }
+      },
+      {
+        tag: '침묵의 밤',
+        emoji: '🕯️😔',
+        caption: '제자들은 흩어지고 도시는 고요해졌다. 희망이 끝난 것처럼 보였다.',
+        speaker: '주인공',
+        lines: [
+          '도시는 갑자기 너무 조용해졌다.',
+          '사람들은 두려워하며 문을 닫고 숨어들었다.',
+          '모든 것이 끝난 것처럼 느껴졌다.',
+          '그런데 이상하게도, 아직 이야기가 끝나지 않았다는 생각이 들었다.'
+        ],
+        quiz: {
+          type: 'choice',
+          question: '이 장면의 분위기를 가장 잘 설명하는 것은?',
+          choices: ['축제와 환호', '침묵과 두려움', '승리의 행진', '시장 소란'],
+          answer: '침묵과 두려움',
+          hint: '본문의 감정선을 따라가면 됩니다.',
+          reward: '직접 획득: L'
+        }
+      },
+      {
+        tag: '새벽',
+        emoji: '🌅🪨',
+        caption: '무덤 앞 돌문이 열려 있다. 예상과 다른 장면이 펼쳐진다.',
+        speaker: '여인들',
+        lines: [
+          '이른 새벽, 무덤으로 향한 사람들이 다급히 소리쳤다.',
+          '“돌문이 열려 있어!”',
+          '나는 떨리는 마음으로 무덤 안을 들여다봤다.',
+          '그곳에는 예수님의 시신이 없었다.'
+        ],
+        quiz: {
+          type: 'choice',
+          question: '무덤 안에서 발견되지 않은 것은 무엇인가?',
+          choices: ['돌문', '예수님의 시신', '세마포', '향품'],
+          answer: '예수님의 시신',
+          hint: '빈 무덤 장면입니다.',
+          reward: '힌트 획득: “구원의 이름의 시작 글자”'
+        }
+      },
+      {
+        tag: '부활',
+        emoji: '✨🙌',
+        caption: '끝난 줄 알았던 이야기가 다시 시작된다. 절망이 희망으로 바뀐다.',
+        speaker: '천사',
+        lines: [
+          '“그는 여기 계시지 않고 살아나셨느니라.”',
+          '그 말을 듣는 순간 심장이 크게 뛰었다.',
+          '십자가가 끝이 아니었다.',
+          '이 모든 것은 부활로 이어지는 이야기였다.'
+        ],
+        quiz: {
+          type: 'text',
+          question: '“그는 여기 계시지 않고 ____나셨느니라.” 빈칸에 들어갈 말을 입력하세요.',
+          answer: ['살아', '살아나'],
+          hint: '부활을 직접 가리키는 핵심 표현입니다.',
+          reward: '직접 획득: O'
+        }
+      },
+      // 추가 장면 (퀴즈 포함)
+      {
+        tag: '확인',
+        emoji: '🧩',
+        caption: '지금까지 본 사건을 되짚어본다.',
+        speaker: '주인공',
+        lines: [
+          '지금까지 본 모든 장면이 머릿속을 스쳐 지나간다.',
+          '이 사건의 의미를 나는 이해하고 있는 걸까?',
+          '마지막으로 한 번 더 생각해본다.'
+        ],
+        quiz: {
+          type: 'choice',
+          question: '예수님의 죽음 이후 이어진 가장 중요한 사건은?',
+          choices: ['도망', '부활', '침묵', '전쟁'],
+          answer: '부활'
+        }
+      },
+      {
+        tag: '복귀',
+        emoji: '⛪💫',
+        caption: '눈앞이 다시 하얘지고, 익숙한 교회 앞 풍경이 돌아온다.',
+        speaker: '주인공',
+        lines: [
+          '눈앞이 다시 새하얘졌다.',
+          '정신을 차려보니 나는 교회 앞 벤치에 앉아 있었다.',
+          '손바닥 안에는 지금까지 모은 단서들이 남아 있었다.',
+          '이제 마지막 정답만 맞히면 된다.'
+        ],
+        quiz: {
+          type: 'text',
+          question: '지금까지의 사건을 한 단어로 요약하면 무엇인가요?',
+          answer: ['사랑']
+        }
+      }
+    ];
+
+    const rewardMap = [
+      'J', 'E', 'S', 'U', 'E', 'L', 'V', 'O', 'S', ' '
+    ];
+
+    // 사용자가 획득하는 실제 순서(섞여 있음)
+    // 사용자가 획득하는 실제 순서(섞여 있음)
+    const rewardsByQuizIndex = {
+      2: 'L',
+      3: 'O',
+      4: 'J',
+      5: 'S',
+      6: 'E',
+      7: 'V',
+      8: 'U',
+      9: 'S',
+      10: 'E'
+    };
+
+    const state = {
+      sceneIndex: 0,
+      lineIndex: 0,
+      quizMode: false,
+      solvedScenes: new Set(),
+      collected: [],
+      finalSolved: false
+    };
+
+    const startSection = document.getElementById('startSection');
+    const storySection = document.getElementById('storySection');
+    const quizSection = document.getElementById('quizSection');
+    const finalSection = document.getElementById('finalSection');
+    const bubble = document.getElementById('bubble');
+    const speaker = document.getElementById('speaker');
+    const lineCounter = document.getElementById('lineCounter');
+    const progressPill = document.getElementById('progressPill');
+    const modePill = document.getElementById('modePill');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const artTag = document.getElementById('artTag');
+    const artEmoji = document.getElementById('artEmoji');
+    const artCaption = document.getElementById('artCaption');
+    const sceneArt = document.getElementById('sceneArt');
+    const letterGrid = document.getElementById('letterGrid');
+    const letterNote = document.getElementById('letterNote');
+    const quizQuestion = document.getElementById('quizQuestion');
+    const quizBody = document.getElementById('quizBody');
+    const quizHint = document.getElementById('quizHint');
+    const quizFeedback = document.getElementById('quizFeedback');
+    const quizNextWrap = document.getElementById('quizNextWrap');
+    const quizNextBtn = document.getElementById('quizNextBtn');
+    const finalInput = document.getElementById('finalInput');
+    const finalSubmit = document.getElementById('finalSubmit');
+    const finalFeedback = document.getElementById('finalFeedback');
+    const endingBox = document.getElementById('endingBox');
+    const startBtn = document.getElementById('startBtn');
+    const pageNumberEl = document.getElementById('pageNumber');
+    const quizPrevBtn = document.getElementById('quizPrevBtn');
+
+    function normalize(value) {
+      return String(value).replace(/\s+/g, '').trim().toLowerCase();
+    }
+
+    function getSceneGradient(index) {
+      const gradients = [
+        'linear-gradient(135deg, #60a5fa, #a78bfa)',
+        'linear-gradient(135deg, #64748b, #0f172a)',
+        'linear-gradient(135deg, #f59e0b, #ef4444)',
+        'linear-gradient(135deg, #f97316, #7c2d12)',
+        'linear-gradient(135deg, #6b7280, #111827)',
+        'linear-gradient(135deg, #1f2937, #000000)',
+        'linear-gradient(135deg, #334155, #0f172a)',
+        'linear-gradient(135deg, #f59e0b, #fde68a)',
+        'linear-gradient(135deg, #60a5fa, #8b5cf6)',
+        'linear-gradient(135deg, #22c55e, #3b82f6)'
+      ];
+      return gradients[index % gradients.length];
+    }
+
+    function renderLetters() {
+      letterGrid.innerHTML = '';
+      const total = 9;
+      const display = Array(total).fill('');
+      state.collected.forEach((char, idx) => {
+        display[idx] = char;
+      });
+
+      for (let i = 0; i < total; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'letter-cell' + (display[i] ? '' : ' empty');
+        cell.textContent = display[i] || '?';
+        letterGrid.appendChild(cell);
+      }
+
+      letterNote.textContent = state.finalSolved
+        ? '정답을 완성했습니다. JESUS LOVE.'
+        : `현재 ${state.collected.length}개의 단서를 모았습니다. 순서는 뒤섞여 있으니 마지막에 조합해 보세요.`;
+    }
+
+    function showStart() {
+      startSection.classList.remove('hidden');
+      storySection.classList.add('hidden');
+      quizSection.classList.add('hidden');
+      finalSection.classList.add('hidden');
+      document.getElementById('titleSection').classList.add('hidden');
+      document.getElementById('lettersSection').classList.add('hidden');
+      progressPill.textContent = '게임 준비';
+      modePill.textContent = '시작 화면';
+      pageNumberEl.textContent = '1번 페이지';
+    }
+
+    function getPageNumber() {
+      let page = 2;
+      for (let i = 0; i < state.sceneIndex; i++) {
+        page += storyData[i].lines.length;
+      }
+      page += state.lineIndex;
+      return page;
+    }
+
+    function renderStory() {
+      const pageNumber = getPageNumber();
+      pageNumberEl.textContent = `${pageNumber}번 페이지`;
+      const lettersSection = document.getElementById('lettersSection');
+      if (state.sceneIndex >= 2) {
+        lettersSection.classList.remove('hidden');
+      } else {
+        lettersSection.classList.add('hidden');
+      }
+      document.getElementById('titleSection').classList.remove('hidden');
+      startSection.classList.add('hidden');
+
+      const scene = storyData[state.sceneIndex];
+      const line = scene.lines[state.lineIndex];
+
+      storySection.classList.remove('hidden');
+      quizSection.classList.add('hidden');
+      finalSection.classList.add('hidden');
+
+      progressPill.textContent = `스토리 ${state.sceneIndex + 1} / ${storyData.length}`;
+      modePill.textContent = scene.quiz && state.lineIndex === scene.lines.length - 1 && !state.solvedScenes.has(state.sceneIndex)
+        ? '퀴즈 대기'
+        : '스토리 진행';
+
+      speaker.textContent = scene.speaker;
+      bubble.textContent = line;
+      lineCounter.textContent = `대화 ${state.lineIndex + 1} / ${scene.lines.length}`;
+      artTag.textContent = `${scene.tag} · 이미지 ${pageNumber}`;
+      artEmoji.textContent = pageNumber;
+      artCaption.textContent = scene.caption;
+      sceneArt.style.background = getSceneGradient(state.sceneIndex);
+
+      prevBtn.disabled = state.sceneIndex === 0 && state.lineIndex === 0;
+
+      const atLastLine = state.lineIndex === scene.lines.length - 1;
+      const hasQuiz = !!scene.quiz;
+      const solved = state.solvedScenes.has(state.sceneIndex);
+
+      if (atLastLine && hasQuiz && !solved) {
+        nextBtn.textContent = '문제 풀기 🧩';
+      } else if (state.sceneIndex === storyData.length - 1 && atLastLine) {
+        nextBtn.textContent = '최종 정답으로 ▶';
+      } else {
+        nextBtn.textContent = '다음 ▶';
+      }
+    }
+
+    function renderQuiz() {
+      const pageNumber = getPageNumber();
+      pageNumberEl.textContent = `${pageNumber}번 페이지`;
+      quizPrevBtn.onclick = () => {
+        quizSection.classList.add('hidden');
+        renderStory();
+      };
+      const scene = storyData[state.sceneIndex];
+      const quiz = scene.quiz;
+      if (!quiz) return;
+
+      storySection.classList.add('hidden');
+      quizSection.classList.remove('hidden');
+      finalSection.classList.add('hidden');
+      progressPill.textContent = `퀴즈 ${state.solvedScenes.size + 1}`;
+      modePill.textContent = '문제 풀이';
+      quizQuestion.textContent = quiz.question;
+      quizFeedback.classList.add('hidden');
+      quizNextWrap.classList.add('hidden');
+      quizBody.innerHTML = '';
+
+      if (quiz.type === 'choice') {
+        const list = document.createElement('div');
+        list.className = 'choice-list';
+        quiz.choices.forEach(choiceText => {
+          const btn = document.createElement('button');
+          btn.className = 'choice';
+          btn.textContent = choiceText;
+          btn.onclick = () => checkAnswer(choiceText);
+          list.appendChild(btn);
+        });
+        quizBody.appendChild(list);
+      } else {
+        const input = document.createElement('input');
+        input.className = 'input';
+        input.id = 'textAnswer';
+        input.placeholder = '정답을 입력하세요';
+        const actions = document.createElement('div');
+        actions.className = 'quiz-actions';
+        const submit = document.createElement('button');
+        submit.className = 'primary';
+        submit.textContent = '정답 제출';
+        submit.onclick = () => checkAnswer(input.value);
+        actions.appendChild(submit);
+        quizBody.appendChild(input);
+        quizBody.appendChild(actions);
+        setTimeout(() => input.focus(), 50);
+      }
+    }
+
+    function showFeedback(ok, message) {
+      quizFeedback.classList.remove('hidden', 'good', 'bad');
+      quizFeedback.classList.add(ok ? 'good' : 'bad');
+      quizFeedback.textContent = message;
+    }
+
+    function rewardForScene(index) {
+      return rewardsByQuizIndex[index] || null;
+    }
+
+    function checkAnswer(value) {
+      const quiz = storyData[state.sceneIndex].quiz;
+      const correct = Array.isArray(quiz.answer)
+        ? quiz.answer.map(normalize).includes(normalize(value))
+        : normalize(value) === normalize(quiz.answer);
+
+      if (!correct) {
+        showFeedback(false, '정답이 아닙니다.');
+        return;
+      }
+
+      state.solvedScenes.add(state.sceneIndex);
+      const reward = rewardForScene(state.sceneIndex);
+      if (reward) state.collected.push(reward);
+      renderLetters();
+      showFeedback(true, '정답입니다!');
+      quizNextWrap.classList.remove('hidden');
+
+      const textAnswer = document.getElementById('textAnswer');
+      if (textAnswer) textAnswer.disabled = true;
+      quizBody.querySelectorAll('button').forEach(btn => {
+        btn.disabled = true;
+      });
+    }
+
+    function moveNextScene() {
+      const scene = storyData[state.sceneIndex];
+      const atLastLine = state.lineIndex === scene.lines.length - 1;
+
+      if (!atLastLine) {
+        state.lineIndex += 1;
+        renderStory();
+        return;
+      }
+
+      if (scene.quiz && !state.solvedScenes.has(state.sceneIndex)) {
+        renderQuiz();
+        return;
+      }
+
+      if (state.sceneIndex < storyData.length - 1) {
+        state.sceneIndex += 1;
+        state.lineIndex = 0;
+        renderStory();
+      } else {
+        renderFinal();
+      }
+    }
+
+    function movePrev() {
+      if (state.lineIndex > 0) {
+        state.lineIndex -= 1;
+        renderStory();
+        return;
+      }
+
+      if (state.sceneIndex > 0) {
+        state.sceneIndex -= 1;
+        state.lineIndex = storyData[state.sceneIndex].lines.length - 1;
+        renderStory();
+        return;
+      }
+
+      showStart();
+    }
+
+    function renderFinal() {
+      pageNumberEl.textContent = '마지막 페이지';
+      // 단서 9개 모으기 전에는 진입 차단
+      if (state.collected.length < 9) {
+        alert('아직 모든 단서를 모으지 못했습니다.');
+        state.sceneIndex = storyData.length - 2;
+        state.lineIndex = 0;
+        renderStory();
+        return;
+      }
+      storySection.classList.add('hidden');
+      quizSection.classList.add('hidden');
+      finalSection.classList.remove('hidden');
+      progressPill.textContent = '최종 단계';
+      modePill.textContent = '정답 조합';
+      finalFeedback.classList.add('hidden');
+    }
+
+    function submitFinal() {
+      if (state.collected.length < 9) {
+        finalFeedback.classList.remove('hidden');
+        finalFeedback.classList.add('bad');
+        finalFeedback.textContent = '단서를 모두 모아야 합니다.';
+        return;
+      }
+      const answer = normalize(finalInput.value);
+      if (answer === normalize('JESUS LOVE')) {
+        state.finalSolved = true;
+        renderLetters();
+        finalFeedback.classList.remove('hidden', 'bad');
+        finalFeedback.classList.add('good');
+        finalFeedback.textContent = '정답입니다! 예루살렘에서 본 사건의 의미를 붙잡았습니다.';
+        endingBox.classList.remove('hidden');
+        endingBox.innerHTML = `
+          꾸..꿈인가?<br>
+          아.. 설교시간에 졸았나보다..<br><br>
+          황범구 목사님이 어떤 쪽지를 들고 계신다.<br>
+          거기로 가보자..
+        `;
+      } else {
+        finalFeedback.classList.remove('hidden', 'good');
+        finalFeedback.classList.add('bad');
+        finalFeedback.textContent = '아직 아닙니다. 지금까지 모은 단서를 다시 조합해 보세요.';
+      }
+    }
+
+    startBtn.addEventListener('click', renderStory);
+    prevBtn.addEventListener('click', movePrev);
+    nextBtn.addEventListener('click', moveNextScene);
+    finalSubmit.addEventListener('click', submitFinal);
+    finalInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') submitFinal();
+    });
+    quizNextBtn.addEventListener('click', () => {
+      quizSection.classList.add('hidden');
+      moveNextScene();
+    });
+
+    renderLetters();
+    showStart();
+  </script>
+</body>
+</html>
